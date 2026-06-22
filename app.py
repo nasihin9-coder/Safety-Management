@@ -20,7 +20,7 @@ if 'iot_anomaly' not in st.session_state:
 if 'cv_alert' not in st.session_state:
     st.session_state.cv_alert = False
 
-st.title("🌊 大型水库大坝安全 AI 辅助管理程序原型 (动态验证版)")
+st.title("🌊 大型水库大坝安全 AI 辅助管理程序原型 (稳定验证版)")
 st.markdown("---")
 
 # ==========================================
@@ -38,22 +38,22 @@ else:
 
 st.sidebar.markdown("---")
 
-# ✨ 互动测试沙箱
+# 🧪 互动测试沙箱
 st.sidebar.header("🧪 动态验证沙箱 (测试用)")
 st.sidebar.markdown("你可以通过以下按钮，手动制造大坝险情，验证 AI 的实时响应能力：")
 
 # 验证控制 1：模拟物联网故障发生
-if st.sidebar.button("💥 注入大坝渗流异常数据", type="secondary"):
+if st.sidebar.button("💥 注入大坝渗流异常数据", type="secondary", key="btn_iot_anomaly"):
     st.session_state.iot_anomaly = True
     st.toast("已成功注入管涌异常数据！请查看 IoT 标签页", icon="📈")
 
 # 验证控制 2：模拟视觉红线越界发生
-if st.sidebar.button("🚶 模拟社会人员越界触发红线", type="secondary"):
+if st.sidebar.button("🚶 模拟社会人员越界触发红线", type="secondary", key="btn_cv_alert"):
     st.session_state.cv_alert = True
     st.toast("已触发电子红线入侵警报！请查看 CV 标签页", icon="👁️")
 
 # 重置验证按钮
-if st.sidebar.button("🔄 恢复系统至安全状态", type="primary"):
+if st.sidebar.button("🔄 恢复系统至安全状态", type="primary", key="btn_reset_all"):
     st.session_state.iot_anomaly = False
     st.session_state.cv_alert = False
     st.toast("系统已重置，全部指标恢复正常安全水平。", icon="✅")
@@ -104,7 +104,7 @@ with tab1:
         fig.add_trace(go.Scatter(x=chart_data['时间 (小时后)'], y=chart_data['AI 预测走势 (mm)'], name='AI 预测：未来48小时运行平稳', mode='lines', line=dict(color='green', dash='dash')))
         
     fig.update_layout(title="大坝背水坡 AP-03 测点渗流量实时预测图", xaxis_title="时间轴 (当前为 0 时刻)", yaxis_title="渗流量 (mm/d)")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key="plotly_iot_chart")
     
     # 动态简报框展现
     if st.session_state.iot_anomaly:
@@ -127,7 +127,8 @@ with tab2:
         cv2.rectangle(img, (150, 80), (350, 260), (0, 0, 255), 3)
         cv2.putText(img, "WARNING: No Helmet (Unsafe)", (150, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         cv2.putText(img, "Worker_01", (150, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-        st.image(img, channels="BGR", use_container_width=True)
+        # 指定固定 key 避免 DOM 节点冲突
+        st.image(img, channels="BGR", use_container_width=True, key="img_camera_01")
         st.warning("⚠️ **违章告警**：检测到运维人员进入闸门检修平台**未佩戴安全帽**！已联动现场蜂鸣器播报驱离。")
         
     with col2:
@@ -138,15 +139,15 @@ with tab2:
         cv2.polylines(img2, [np.array([[0,200], [500,200]])], isClosed=False, color=(0,0,255), thickness=3)
         cv2.putText(img2, "DANGER ZONE LINE", (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
         
-        # 根据侧边栏控制，动态渲染是否有入侵者
+        # 根据侧边栏控制，动态渲染是否有入侵者，同样指定唯一的 key 绑定节点
         if st.session_state.cv_alert:
             cv2.rectangle(img2, (200, 120), (280, 250), (0, 0, 255), 2)
             cv2.putText(img2, "INTRUDER: Social Personnel", (170, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            st.image(img2, channels="BGR", use_container_width=True)
+            st.image(img2, channels="BGR", use_container_width=True, key="img_camera_02_alert")
             st.error("🚨 **越界告警**：监测到**社会人员翻越围栏**涉水！系统已自动接通附近保安岗亭对讲机。")
         else:
             cv2.putText(img2, "STATUS: CLEAR", (200, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            st.image(img2, channels="BGR", use_container_width=True)
+            st.image(img2, channels="BGR", use_container_width=True, key="img_camera_02_clear")
             st.success("✅ **区域安全**：当前无外部人员非法闯入红线区域。")
 
 # ------------------------------------------
@@ -157,7 +158,7 @@ with tab3:
     st.caption("依据《水库大坝安全管理条例》，当大坝发生突发重特大漫坝或溃坝险情时，一键启动 AI 赋能的应急调度。")
     
     # 提供一个一键体验全自动化应急响应的按钮
-    if st.button("🔥 模拟突发重特大漫坝/溃坝险情：启动一键应急响应", type="primary"):
+    if st.button("🔥 模拟突发重特大漫坝/溃坝险情：启动一键应急响应", type="primary", key="btn_emergency_trigger"):
         with st.spinner("⏳ AI 正在根据水利流体力学模型计算灾害演进路线并生成最佳调度方案..."):
             time.sleep(1.5) 
             
