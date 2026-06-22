@@ -20,7 +20,7 @@ if 'iot_anomaly' not in st.session_state:
 if 'cv_alert' not in st.session_state:
     st.session_state.cv_alert = False
 
-st.title("🌊 大型水库大坝安全 AI 辅助管理程序原型 (稳定验证版)")
+st.title("🌊 大型水库大坝安全 AI 辅助管理程序原型 (旗舰稳定版)")
 st.markdown("---")
 
 # ==========================================
@@ -127,8 +127,10 @@ with tab2:
         cv2.rectangle(img, (150, 80), (350, 260), (0, 0, 255), 3)
         cv2.putText(img, "WARNING: No Helmet (Unsafe)", (150, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         cv2.putText(img, "Worker_01", (150, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-        # 指定固定 key 避免 DOM 节点冲突
-        st.image(img, channels="BGR", use_container_width=True, key="img_camera_01")
+        
+        # 【修正优化】转换格式并移除引起兼容问题的参数
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        st.image(img_rgb, key="img_camera_01")
         st.warning("⚠️ **违章告警**：检测到运维人员进入闸门检修平台**未佩戴安全帽**！已联动现场蜂鸣器播报驱离。")
         
     with col2:
@@ -139,15 +141,17 @@ with tab2:
         cv2.polylines(img2, [np.array([[0,200], [500,200]])], isClosed=False, color=(0,0,255), thickness=3)
         cv2.putText(img2, "DANGER ZONE LINE", (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
         
-        # 根据侧边栏控制，动态渲染是否有入侵者，同样指定唯一的 key 绑定节点
+        # 根据侧边栏控制，动态渲染是否有入侵者
         if st.session_state.cv_alert:
             cv2.rectangle(img2, (200, 120), (280, 250), (0, 0, 255), 2)
             cv2.putText(img2, "INTRUDER: Social Personnel", (170, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            st.image(img2, channels="BGR", use_container_width=True, key="img_camera_02_alert")
+            img2_rgb = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+            st.image(img2_rgb, key="img_camera_02_alert")
             st.error("🚨 **越界告警**：监测到**社会人员翻越围栏**涉水！系统已自动接通附近保安岗亭对讲机。")
         else:
             cv2.putText(img2, "STATUS: CLEAR", (200, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            st.image(img2, channels="BGR", use_container_width=True, key="img_camera_02_clear")
+            img2_rgb = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+            st.image(img2_rgb, key="img_camera_02_clear")
             st.success("✅ **区域安全**：当前无外部人员非法闯入红线区域。")
 
 # ------------------------------------------
