@@ -20,7 +20,7 @@ if 'iot_anomaly' not in st.session_state:
 if 'cv_alert' not in st.session_state:
     st.session_state.cv_alert = False
 
-st.title("🌊 大型水库大坝安全 AI 辅助管理程序原型 (全兼容版本)")
+st.title("🌊 大型水库大坝安全 AI 辅助管理程序原型 ")
 st.markdown("---")
 
 # ==========================================
