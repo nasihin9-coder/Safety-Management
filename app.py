@@ -84,7 +84,8 @@ with tab2:
         cv2.putText(img, "WARNING: No Helmet (Unsafe)", (150, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         cv2.putText(img, "Worker_01", (150, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
         st.image(img, channels="BGR", use_container_width=True)
-        st.error("🚨 **违章告警**：检测到运维人员进入闸门检修平台**未佩戴安全帽**！已联动现场蜂鸣器播报驱离。")
+        # 优化：一般违章使用黄色 warning 组件
+        st.warning("⚠️ **违章告警**：检测到运维人员进入闸门检修平台**未佩戴安全帽**！已联动现场蜂鸣器播报驱离。")
         
     with col2:
         st.subheader("📷 02号摄像头：泄洪道下游红线区")
@@ -96,7 +97,8 @@ with tab2:
         cv2.rectangle(img2, (200, 120), (280, 250), (0, 0, 255), 2)
         cv2.putText(img2, "INTRUDER: Social Personnel", (170, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         st.image(img2, channels="BGR", use_container_width=True)
-        st.critical("🚨 **越界告警**：检测到**社会人员翻越围栏**涉水！系统已自动接通附近保安岗亭对讲机。")
+        # 修复：将 st.critical 修改为符合 Streamlit 标准的 st.error
+        st.error("🚨 **越界告警**：检测到**社会人员翻越围栏**涉水！系统已自动接通附近保安岗亭对讲机。")
 
 # ------------------------------------------
 # Tab 3: AI 智能应急指挥中心
